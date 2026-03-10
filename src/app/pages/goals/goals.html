@@ -1,0 +1,51 @@
+<app-navbar></app-navbar>
+
+<div class="page-content goals-container">
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'my'" (click)="loadMyGoals()">
+      Mis metas
+    </button>
+    <button class="tab" [class.active]="activeTab === 'partner'" (click)="loadPartnerGoals()">
+      Metas de mi pareja
+    </button>
+    <button class="tab" [class.active]="activeTab === 'shared'" (click)="loadSharedGoals()">
+      Metas compartidas
+    </button>
+  </div>
+
+  @if (activeTab === 'my') {
+    <button class="new-goal-btn" (click)="showForm = true">+ Nueva meta</button>
+  }
+
+  @if (showForm) {
+    <goal-form
+      [hasPartner]="hasPartner"
+      [isEditing]="editingGoal !== null"
+      [goal]="editingGoal"
+      (formClosed)="showForm = false; editingGoal = null"
+      (goalSaved)="onGoalSaved()"
+    ></goal-form>
+  }
+
+  @if (activeTab !== 'my' && !hasPartner) {
+    <div class="no-partner">
+      <p>Aún no tienes pareja conectada 💔</p>
+      <a routerLink="/pairing">Conectar pareja</a>
+    </div>
+  } @else {
+    @for (goal of goals; track goal.id) {
+      <app-goal-card
+        [goal]="goal"
+        (goalDeleted)="loadMyGoals()"
+        (goalEdited)="onEditGoal($event)"
+      ></app-goal-card>
+    } @empty {
+      <p>Aún no hay metas aquí 🎯</p>
+      <button (click)="showForm = true">+ Añadir meta</button>
+    }
+  }
+</div>
+
+@if (activeTab === 'my') {
+  <button class="new-goal-fab" (click)="showForm = true" aria-label="Nueva meta">+</button>
+}

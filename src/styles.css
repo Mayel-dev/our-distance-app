@@ -1,1 +1,180 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles for Our Distance - clean, minimal, romantic */
+
+:root {
+  /* Palette */
+  --color-pink: #f6c9d8; /* soft rose */
+  --color-pink-strong: #ff8fb1; /* accent */
+  --color-white: #ffffff;
+  --color-gray-100: #f5f5f7; /* light gray */
+  --color-gray-300: #dcdfe4;
+  --color-text: #33323d; /* soft dark */
+
+  /* Spacing & radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --gap: 1rem;
+}
+
+/* Reset / base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+app-root {
+  height: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-white);
+  color: var(--color-text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Layout container */
+.app-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: calc(var(--gap) * 1.25);
+}
+
+/* Cards */
+.card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-100);
+  box-shadow: 0 6px 18px rgba(51, 50, 61, 0.04);
+  padding: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--color-pink) 0%, var(--color-pink-strong) 100%);
+  color: var(--color-white);
+  box-shadow: 0 6px 14px rgba(255, 143, 177, 0.12);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(255, 143, 177, 0.14);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-gray-100);
+}
+
+/* Links */
+a {
+  color: var(--color-pink-strong);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Accent elements to add a subtle romantic touch */
+.accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-pink-strong);
+}
+
+.accent::before {
+  content: '\2665'; /* heart */
+  color: var(--color-pink-strong);
+  font-size: 0.9rem;
+  transform: translateY(1px);
+}
+
+/* Form elements */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+}
+
+/* Small helpers */
+.muted {
+  color: #7b7b85;
+  font-size: 0.95rem;
+}
+
+/* Focus styles for accessibility */
+:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 143, 177, 0.15);
+  border-radius: 6px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 1rem;
+  }
+}
+
+/* Espacio para el navbar fijo */
+:root {
+  --navbar-offset-desktop: 0px;
+  --navbar-offset-mobile: 0px;
+}
+
+.page-content {
+  padding-top: 0; /* navbar is sticky and occupies layout space now */
+}
+
+@media (max-width: 600px) {
+  .page-content {
+    padding-top: 0;
+  }
+}
+
+/* End of global styles */

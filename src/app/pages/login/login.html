@@ -1,0 +1,14 @@
+<div class="login-page">
+  <div class="login-card">
+    <h2 class="form-title">Iniciar sesión</h2>
+    <p class="login-desc">Accede a tu cuenta y sincroniza metas con tu pareja</p>
+
+    <input class="login-input" type="email" placeholder="Email" [(ngModel)]="email" />
+
+    <input class="login-input" type="password" placeholder="Contraseña" [(ngModel)]="password" />
+
+    <button class="btn-enter" (click)="login()">Entrar</button>
+
+    <a class="signup-link" routerLink="/register">¿No tienes cuenta? Regístrate</a>
+  </div>
+</div>

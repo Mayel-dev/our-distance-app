@@ -1,0 +1,32 @@
+<div class="goal-card">
+  <div class="title-row">
+    <div>
+      <div class="goal-title">{{ goal.title }}</div>
+      @if (goal.description) {
+        <div class="goal-desc">{{ goal.description }}</div>
+      }
+    </div>
+
+    <div class="goal-meta">
+      <span
+        class="status-badge {{
+          goal.status.toLowerCase() === 'pending'
+            ? 'pending'
+            : goal.status.toLowerCase() === 'in_progress' ||
+                goal.status.toLowerCase() === 'in-progress'
+              ? 'in-progress'
+              : 'completed'
+        }}"
+        >{{ goal.status }}</span
+      >
+    </div>
+  </div>
+
+  <div class="goal-footer">
+    <div class="goal-author">{{ goal.createdBy.username }}</div>
+    <div class="goal-actions">
+      <button class="action-btn edit" (click)="onEdit()">Editar</button>
+      <button class="action-btn delete" (click)="onDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>

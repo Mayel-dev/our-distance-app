@@ -1,0 +1,66 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from './auth.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class GoalsService {
+  private apiUrl = 'http://localhost:3000';
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+  ) {}
+
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getMyGoals() {
+    return this.http.get(`${this.apiUrl}/goals/my-goals`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getPartnerGoals() {
+    return this.http.get(`${this.apiUrl}/goals/partner-goals`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getSharedGoals() {
+    return this.http.get(`${this.apiUrl}/goals/shared-goals`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  createGoal(data: {
+    title: string;
+    description?: string;
+    goalType: string;
+    categoryIcon?: string;
+  }) {
+    return this.http.post(`${this.apiUrl}/goals`, data, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  deleteGoal(id: string) {
+    return this.http.delete(`${this.apiUrl}/goals/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  updateGoal(
+    id: string,
+    data: { title?: string; description?: string; status?: string; categoryIcon?: string },
+  ) {
+    return this.http.patch(`${this.apiUrl}/goals/${id}`, data, {
+      headers: this.getHeaders(),
+    });
+  }
+}

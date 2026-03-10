@@ -1,0 +1,25 @@
+<nav class="navbar">
+  <div class="nav-top">
+    <a class="logo" routerLink="/home">
+      <span class="brand-mark">♥</span>
+      <span class="brand-text">Our Distance</span>
+    </a>
+
+    <button class="hamburger" aria-label="Abrir menú" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+
+  <div class="nav-links" [class.open]="isMenuOpen">
+    <a routerLink="/home" (click)="closeMenu()">Inicio</a>
+    <a routerLink="/goals" (click)="closeMenu()">Metas</a>
+    <a routerLink="/pairing" (click)="closeMenu()">Conectar</a>
+    <a routerLink="/profile" (click)="closeMenu()">Perfil</a>
+
+    <div class="nav-actions">
+      <button class="logout-btn" (click)="logout(); closeMenu()">Cerrar sesión</button>
+    </div>
+  </div>
+</nav>

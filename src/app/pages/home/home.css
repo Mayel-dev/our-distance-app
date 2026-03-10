@@ -1,0 +1,103 @@
+/* Home page styles for Our Distance */
+
+.home-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.home-card {
+  width: 100%;
+  background: var(--color-white);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(51, 50, 61, 0.04);
+  border: 1px solid var(--color-gray-100);
+}
+
+.home-card h2 {
+  font-size: 1.6rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.welcome-sub {
+  color: #6b6b73;
+  margin-bottom: 1rem;
+}
+
+.pairing-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0 1.25rem 0;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-badge.connected {
+  background: rgba(76, 175, 80, 0.12);
+  color: #2e7d32;
+}
+
+.status-badge.unpaired {
+  background: rgba(158, 158, 158, 0.12);
+  color: #6b6b73;
+}
+
+.pairing-code {
+  display: inline-block;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: 0.14rem;
+  color: var(--color-pink-strong);
+  background: linear-gradient(180deg, rgba(246, 201, 216, 0.18), rgba(255, 143, 177, 0.06));
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(255, 143, 177, 0.06);
+  border: 1px solid rgba(255, 143, 177, 0.12);
+}
+
+.pairing-note {
+  font-size: 0.95rem;
+  color: #6b6b73;
+}
+
+.home-cta {
+  margin-top: 0.6rem;
+}
+
+.home-cta .btn-primary {
+  padding: 0.7rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Small screens */
+@media (max-width: 520px) {
+  .pairing-code {
+    font-size: 1.5rem;
+    padding: 0.5rem 0.8rem;
+  }
+  .home-card {
+    padding: 1.25rem;
+  }
+  .home-container {
+    padding: 1rem;
+  }
+}

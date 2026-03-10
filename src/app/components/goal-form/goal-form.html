@@ -1,0 +1,35 @@
+<div class="card goal-form-card">
+  <h3 class="form-title">{{ isEditing ? 'Editar meta' : 'Nueva meta' }}</h3>
+
+  <div class="gf-row">
+    <input class="goal-input" type="text" placeholder="Título" [(ngModel)]="title" />
+
+    <textarea
+      class="goal-textarea"
+      placeholder="Descripción (opcional)"
+      [(ngModel)]="description"
+    ></textarea>
+
+    <select class="goal-select" [(ngModel)]="goalType">
+      <option value="PRIVATE">Privada</option>
+      <option value="SHARED" [disabled]="!hasPartner">
+        Compartida {{ !hasPartner ? '🔒' : '' }}
+      </option>
+    </select>
+
+    @if (isEditing) {
+      <select class="goal-select" [(ngModel)]="status">
+        <option value="PENDING">⏳ Pendiente</option>
+        <option value="IN_PROGRESS">🔄 En progreso</option>
+        <option value="COMPLETED">✅ Completado</option>
+      </select>
+    }
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" (click)="submit()">
+      {{ isEditing ? 'Guardar cambios' : 'Crear meta' }}
+    </button>
+    <button class="btn btn-ghost" (click)="cancel()">Cancelar</button>
+  </div>
+</div>

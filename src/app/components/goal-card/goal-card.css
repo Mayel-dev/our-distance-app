@@ -1,0 +1,119 @@
+/* Goal card styles for Our Distance */
+
+.goal-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border: 1px solid var(--color-gray-100);
+  box-shadow: 0 8px 20px rgba(51, 50, 61, 0.04);
+}
+
+.goal-card .title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.goal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.goal-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.02rem;
+}
+
+.status-badge.pending {
+  background: rgba(158, 158, 158, 0.12);
+  color: #616161;
+}
+
+.status-badge.in-progress {
+  background: rgba(30, 136, 229, 0.12);
+  color: #1565c0;
+}
+
+.status-badge.completed {
+  background: rgba(76, 175, 80, 0.12);
+  color: #2e7d32;
+}
+
+.goal-desc {
+  color: #6b6b73;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+.goal-author {
+  font-size: 0.85rem;
+  color: #7b7b85;
+  font-weight: 600;
+}
+
+/* Action buttons (edit/delete) */
+.goal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text);
+  padding: 0.28rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
+}
+
+.action-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+.action-btn.delete {
+  color: #b00020;
+}
+
+.action-btn.edit {
+  color: var(--color-pink-strong);
+}
+
+/* Compact footer row */
+.goal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 520px) {
+  .goal-card {
+    padding: 0.85rem;
+  }
+  .goal-title {
+    font-size: 1rem;
+  }
+}

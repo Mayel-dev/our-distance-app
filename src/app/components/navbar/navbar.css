@@ -1,0 +1,198 @@
+/* Navbar styles for Our Distance */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: var(--color-white);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-gray-100);
+  box-shadow: 0 6px 18px rgba(51, 50, 61, 0.06);
+  z-index: 1000;
+}
+
+/* removed local .page-content rule (use global spacing in src/styles.css) */
+
+.navbar .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.logo .brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--color-pink), var(--color-pink-strong));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-size: 1rem;
+  box-shadow: 0 6px 14px rgba(255, 143, 177, 0.12);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hamburger button (hidden on desktop) */
+.hamburger {
+  display: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0.35rem;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hamburger .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--color-text);
+  margin: 3px 0;
+  border-radius: 2px;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease,
+    background-color 200ms ease;
+}
+
+.nav-links a {
+  color: var(--color-text);
+  text-decoration: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease;
+  font-weight: 500;
+}
+
+.nav-links a:hover,
+.nav-links a:focus {
+  color: var(--color-pink-strong);
+  background: rgba(255, 143, 177, 0.06);
+  transform: translateY(-1px);
+}
+
+/* Logout button (ghost style) */
+.logout-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--color-gray-100);
+  color: var(--color-text);
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.logout-btn:hover,
+.logout-btn:focus {
+  background: rgba(255, 143, 177, 0.06);
+  color: var(--color-pink-strong);
+  transform: translateY(-1px);
+}
+
+/* Small helper to visually separate nav links and logout on wide screens */
+.nav-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Accessibility focus */
+.nav-links a:focus,
+.logout-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 143, 177, 0.12);
+}
+
+/* Responsive: stack links on small screens */
+@media (max-width: 600px) {
+  .navbar {
+    height: auto;
+    padding: 0.6rem 0.8rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .nav-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+    /* hidden by default until opened */
+    display: none;
+  }
+
+  .nav-links a {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .nav-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* show hamburger on mobile */
+  .hamburger {
+    display: inline-flex;
+  }
+
+  /* when menu is open, show the links */
+  .nav-links.open {
+    display: flex;
+  }
+
+  /* animate hamburger into an X when expanded */
+  .hamburger[aria-expanded='true'] .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+    background: var(--color-pink-strong);
+  }
+
+  .hamburger[aria-expanded='true'] .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger[aria-expanded='true'] .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+    background: var(--color-pink-strong);
+  }
+}
+
+/* end of file */

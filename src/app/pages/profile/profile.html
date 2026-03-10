@@ -1,0 +1,43 @@
+<app-navbar></app-navbar>
+
+<div class="page-content profile-container">
+  @if (user) {
+    <div class="card profile-card">
+      <h2 class="profile-title">Mi perfil</h2>
+
+      <div class="profile-info">
+        <p>
+          <span class="muted">Username:</span> <strong>{{ user.username }}</strong>
+        </p>
+        <p><span class="muted">Email:</span> {{ user.email }}</p>
+        <p>
+          <span class="muted">Pareja:</span>
+          {{ user.partner ? user.partner.username : 'Sin pareja' }}
+        </p>
+        <p>
+          <span class="muted">Código:</span> <span class="accent">{{ user.pairingCode }}</span>
+        </p>
+      </div>
+
+      <button class="btn btn-primary" (click)="showForm = !showForm">Editar perfil</button>
+
+      @if (showForm) {
+        <div class="edit-form">
+          <input type="text" placeholder="Nuevo username" [(ngModel)]="newUsername" />
+          <input type="password" placeholder="Contraseña actual" [(ngModel)]="currentPassword" />
+          <input type="password" placeholder="Nueva contraseña" [(ngModel)]="newPassword" />
+          <div class="form-actions">
+            <button class="btn btn-primary" (click)="update()">Guardar</button>
+            <button class="btn btn-ghost" (click)="showForm = false">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      @if (message) {
+        <p class="profile-message">{{ message }}</p>
+      }
+
+      <button class="btn-danger" (click)="deleteAccount()">Eliminar cuenta</button>
+    </div>
+  }
+</div>

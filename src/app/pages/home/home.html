@@ -1,0 +1,30 @@
+<app-navbar></app-navbar>
+
+<div class="page-content home-container">
+  @if (user) {
+    <div class="home-card card">
+      <h2>
+        Bienvenido, <span class="accent">{{ user.username }}</span> 👋
+      </h2>
+
+      <div class="pairing-row">
+        <div class="partner-status">
+          @if (user.partner) {
+            <span class="status-badge connected">Conectado con {{ user.partner.username }} ❤️</span>
+          } @else {
+            <span class="status-badge unpaired">Sin pareja conectada</span>
+          }
+        </div>
+
+        <div class="pairing-code">
+          <p class="pairing-note muted">Tu código de conexión:</p>
+          <div class="code">{{ user.pairingCode }}</div>
+        </div>
+      </div>
+
+      <div class="home-cta">
+        <a routerLink="/goals" class="btn btn-primary">Ir a metas →</a>
+      </div>
+    </div>
+  }
+</div>

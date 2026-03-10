@@ -1,0 +1,36 @@
+<app-navbar></app-navbar>
+
+<div class="page-content pairing-container">
+  <h2 class="pairing-title">Conectar pareja 💑</h2>
+
+  @if (partner) {
+    <div class="card connected-card">
+      <h3>
+        Conectado con <span class="accent">{{ partner.username }}</span> ❤️
+      </h3>
+      <p class="muted">{{ partner.email }}</p>
+      <button class="btn-disconnect" (click)="disconnect()">Desconectar pareja</button>
+    </div>
+  } @else {
+    <div class="card my-code-card">
+      <p class="muted">Tu código de conexión:</p>
+      <h1 class="pairing-code">{{ pairingCode }}</h1>
+      <button class="btn btn-primary" (click)="copyCode()">Copiar código</button>
+    </div>
+
+    <div class="card connect-form-card">
+      <p>Ingresa el código de tu pareja:</p>
+      <input
+        class="pairing-input"
+        type="text"
+        placeholder="Código de pareja"
+        [(ngModel)]="partnerCode"
+      />
+      <button class="btn btn-primary" (click)="connect()">Conectar</button>
+    </div>
+  }
+
+  @if (message) {
+    <p class="pairing-message">{{ message }}</p>
+  }
+</div>
