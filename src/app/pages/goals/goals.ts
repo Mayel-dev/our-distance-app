@@ -24,6 +24,43 @@ export class Goals implements OnInit {
 
   constructor(private goalsService: GoalsService) {}
 
+  // Helper method to avoid code duplication when fetching goals for different tabs
+  private fetchGoals(request: any, tab: 'my' | 'partner' | 'shared') {
+    this.loading = true;
+
+    request.subscribe({
+      next: (response: any) => {
+        this.goals = response;
+        this.hasPartner = true;
+        this.loading = false;
+      },
+      error: () => {
+        if (tab !== 'my') {
+          this.hasPartner = false;
+        }
+        this.goals = [];
+        this.loading = false;
+      },
+    });
+  }
+   
+  // Method to switch between tabs and load corresponding goals
+  setTab(tab: 'my' | 'partner' | 'shared') {
+    this.activeTab = tab;
+
+    if (tab === 'my') {
+      this.loadMyGoals();
+    }
+
+    if (tab === 'partner') {
+      this.loadPartnerGoals();
+    }
+
+    if (tab === 'shared') {
+      this.loadSharedGoals();
+    }
+  }
+
   ngOnInit() {
     this.loadMyGoals();
   }
@@ -46,55 +83,16 @@ export class Goals implements OnInit {
     this.showForm = true;
   }
 
+  // Tab loading methods
   loadMyGoals() {
-    this.activeTab = 'my';
-    this.loading = true;
-
-    this.goalsService.getMyGoals().subscribe({
-      next: (response: any) => {
-        this.goals = response;
-        this.loading = false;
-      },
-      error: () => {
-        this.goals = [];
-        this.loading = false;
-      },
-    });
+    this.fetchGoals(this.goalsService.getMyGoals(), 'my');
   }
 
   loadPartnerGoals() {
-    this.activeTab = 'partner';
-    this.loading = true;
-
-    this.goalsService.getPartnerGoals().subscribe({
-      next: (response: any) => {
-        this.goals = response;
-        this.hasPartner = true;
-        this.loading = false;
-      },
-      error: () => {
-        this.hasPartner = false;
-        this.goals = [];
-        this.loading = false;
-      },
-    });
+    this.fetchGoals(this.goalsService.getPartnerGoals(), 'partner');
   }
 
   loadSharedGoals() {
-    this.activeTab = 'shared';
-    this.loading = true;
-
-    this.goalsService.getSharedGoals().subscribe({
-      next: (response: any) => {
-        this.goals = response;
-        this.hasPartner = true;
-        this.loading = false;
-      },
-      error: () => {
-        this.hasPartner = false;
-        this.goals = [];
-        this.loading = false;
-      },
-    });
+    this.fetchGoals(this.goalsService.getSharedGoals(), 'shared');
   }
 }

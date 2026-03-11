@@ -2,15 +2,15 @@
 
 <div class="page-content goals-container">
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'my'" (click)="loadMyGoals()">
+    <button class="tab" [class.active]="activeTab === 'my'" (click)="setTab('my')">
       Mis metas
     </button>
 
-    <button class="tab" [class.active]="activeTab === 'partner'" (click)="loadPartnerGoals()">
+    <button class="tab" [class.active]="activeTab === 'partner'" (click)="setTab('partner')">
       Metas de mi pareja
     </button>
 
-    <button class="tab" [class.active]="activeTab === 'shared'" (click)="loadSharedGoals()">
+    <button class="tab" [class.active]="activeTab === 'shared'" (click)="setTab('shared')">
       Metas compartidas
     </button>
   </div>
