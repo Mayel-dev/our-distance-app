@@ -14,14 +14,26 @@ export class Pairing implements OnInit {
   partnerCode = '';
   message = '';
   partner: any = null;
+  loading = false;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
+    this.loadPairingData();
+  }
+
+  loadPairingData() {
+    this.loading = true;
+
     this.authService.getMe().subscribe({
       next: (response: any) => {
         this.pairingCode = response.pairingCode;
         this.partner = response.partner || null;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.message = 'No se pudo cargar la información de pareja';
       },
     });
   }
@@ -30,6 +42,8 @@ export class Pairing implements OnInit {
     this.authService.connectPartner(this.partnerCode).subscribe({
       next: () => {
         this.message = '¡Pareja conectada exitosamente! ❤️';
+        this.partnerCode = '';
+        this.loadPairingData();
       },
       error: () => {
         this.message = 'Código inválido o ya tienes pareja conectada';
@@ -46,9 +60,8 @@ export class Pairing implements OnInit {
     if (confirm('¿Seguro que quieres desconectarte de tu pareja?')) {
       this.authService.disconnectPartner().subscribe({
         next: () => {
-          this.partner = null;
           this.message = 'Pareja desconectada';
-          this.ngOnInit();
+          this.loadPairingData();
         },
       });
     }

@@ -3,7 +3,9 @@
 <div class="page-content pairing-container">
   <h2 class="pairing-title">Conectar pareja 💑</h2>
 
-  @if (partner) {
+  @if (loading) {
+    <p>Cargando información...</p>
+  } @else if (partner) {
     <div class="card connected-card">
       <h3>
         Conectado con <span class="accent">{{ partner.username }}</span> ❤️
