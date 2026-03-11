@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class GoalsService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://our-distance-production.up.railway.app';
 
   constructor(
     private http: HttpClient,
