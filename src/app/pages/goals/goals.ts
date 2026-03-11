@@ -17,7 +17,13 @@ export class Goals implements OnInit {
   showForm = false;
 
   onGoalSaved() {
-    this.loadMyGoals(); // recarga las metas después de crear
+    if (this.activeTab === 'my') {
+      this.loadMyGoals();
+    } else if (this.activeTab === 'partner') {
+      this.loadPartnerGoals();
+    } else if (this.activeTab === 'shared') {
+      this.loadSharedGoals();
+    }
   }
 
   editingGoal: Goal | null = null;
