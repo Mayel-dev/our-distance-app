@@ -16,6 +16,7 @@ import { GoalForm } from '../../components/goal-form/goal-form';
 export class Goals implements OnInit {
   showForm = false;
 
+  // This method is called when a goal is saved (either created or updated)
   onGoalSaved() {
     if (this.activeTab === 'my') {
       this.loadMyGoals();
