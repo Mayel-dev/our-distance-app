@@ -15,9 +15,23 @@ import { GoalForm } from '../../components/goal-form/goal-form';
 })
 export class Goals implements OnInit {
   showForm = false;
+  editingGoal: Goal | null = null;
 
-  // This method is called when a goal is saved (either created or updated)
+  activeTab: 'my' | 'partner' | 'shared' = 'my';
+  goals: Goal[] = [];
+  hasPartner = false;
+  loading = false;
+
+  constructor(private goalsService: GoalsService) {}
+
+  ngOnInit() {
+    this.loadMyGoals();
+  }
+
   onGoalSaved() {
+    this.showForm = false;
+    this.editingGoal = null;
+
     if (this.activeTab === 'my') {
       this.loadMyGoals();
     } else if (this.activeTab === 'partner') {
@@ -27,56 +41,59 @@ export class Goals implements OnInit {
     }
   }
 
-  editingGoal: Goal | null = null;
-
   onEditGoal(goal: Goal) {
     this.editingGoal = goal;
     this.showForm = true;
   }
 
-  activeTab: 'my' | 'partner' | 'shared' = 'my';
-  goals: Goal[] = [];
-  hasPartner = false;
-
-  constructor(private goalsService: GoalsService) {}
-
-  ngOnInit() {
-    this.loadMyGoals();
-  }
-
   loadMyGoals() {
     this.activeTab = 'my';
+    this.loading = true;
+
     this.goalsService.getMyGoals().subscribe({
       next: (response: any) => {
         this.goals = response;
+        this.loading = false;
+      },
+      error: () => {
+        this.goals = [];
+        this.loading = false;
       },
     });
   }
 
   loadPartnerGoals() {
     this.activeTab = 'partner';
+    this.loading = true;
+
     this.goalsService.getPartnerGoals().subscribe({
       next: (response: any) => {
         this.goals = response;
         this.hasPartner = true;
+        this.loading = false;
       },
       error: () => {
         this.hasPartner = false;
         this.goals = [];
+        this.loading = false;
       },
     });
   }
 
   loadSharedGoals() {
     this.activeTab = 'shared';
+    this.loading = true;
+
     this.goalsService.getSharedGoals().subscribe({
       next: (response: any) => {
         this.goals = response;
         this.hasPartner = true;
+        this.loading = false;
       },
       error: () => {
         this.hasPartner = false;
         this.goals = [];
+        this.loading = false;
       },
     });
   }
