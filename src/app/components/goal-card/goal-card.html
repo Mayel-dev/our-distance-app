@@ -17,16 +17,25 @@
               ? 'in-progress'
               : 'completed'
         }}"
-        >{{ goal.status }}</span
       >
+        {{ goal.status }}
+      </span>
     </div>
   </div>
 
   <div class="goal-footer">
     <div class="goal-author">{{ goal.createdBy.username }}</div>
-    <div class="goal-actions">
-      <button class="action-btn edit" (click)="onEdit()">Editar</button>
-      <button class="action-btn delete" (click)="onDelete()">Eliminar</button>
-    </div>
+
+    @if (canEdit || canDelete) {
+      <div class="goal-actions">
+        @if (canEdit) {
+          <button class="action-btn edit" (click)="onEdit()">Editar</button>
+        }
+
+        @if (canDelete) {
+          <button class="action-btn delete" (click)="onDelete()">Eliminar</button>
+        }
+      </div>
+    }
   </div>
 </div>

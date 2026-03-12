@@ -9,4 +9,5 @@ export interface Goal {
   categoryIcon?: string;
   createdAt: string;
   createdBy: User;
+  partner?: User | null
 }

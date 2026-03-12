@@ -42,6 +42,7 @@
         [goal]="goal"
         (goalDeleted)="onGoalSaved()"
         (goalEdited)="onEditGoal($event)"
+        [currentUserId]="currentUserId"
       ></app-goal-card>
     } @empty {
       <p>Aún no hay metas aquí 🎯</p>

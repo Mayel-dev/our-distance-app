@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Navbar } from '../../components/navbar/navbar';
 import { GoalsService } from '../../services/goals.service';
+import { AuthService } from '../../services/auth.service';
 import { Goal } from '../../models/goal.model';
 import { CommonModule } from '@angular/common';
 import { GoalCard } from '../../components/goal-card/goal-card';
@@ -22,7 +23,12 @@ export class Goals implements OnInit {
   hasPartner = false;
   loading = false;
 
-  constructor(private goalsService: GoalsService) {}
+  currentUserId: string | null = null;
+
+  constructor(
+    private goalsService: GoalsService,
+    private authService: AuthService,
+  ) {}
 
   // Helper method to avoid code duplication when fetching goals for different tabs
   private fetchGoals(request: any, tab: 'my' | 'partner' | 'shared') {
@@ -30,6 +36,7 @@ export class Goals implements OnInit {
 
     request.subscribe({
       next: (response: any) => {
+        console.log('Goals response:', response);
         this.goals = response;
         this.hasPartner = true;
         this.loading = false;
@@ -43,10 +50,24 @@ export class Goals implements OnInit {
       },
     });
   }
-   
+
+  // Method to get the current logged-in user
+  private loadCurrentUser() {
+    this.authService.getMe().subscribe({
+      next: (user: any) => {
+        this.currentUserId = user.id;
+      },
+      error: (err) => {
+        console.error('Error loading current user', err);
+      },
+    });
+  }
+
   // Method to switch between tabs and load corresponding goals
   setTab(tab: 'my' | 'partner' | 'shared') {
     this.activeTab = tab;
+    this.showForm = false;
+    this.editingGoal = null;
 
     if (tab === 'my') {
       this.loadMyGoals();
@@ -62,6 +83,7 @@ export class Goals implements OnInit {
   }
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.loadMyGoals();
   }
 
