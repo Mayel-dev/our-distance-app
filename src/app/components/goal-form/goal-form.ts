@@ -12,9 +12,11 @@ import { Goal } from '../../models/goal.model';
 export class GoalForm implements OnInit {
   @Input() isEditing = false;
   @Input() goal: Goal | null = null;
+  @Input() hasPartner = false;
+  @Input() currentUserId: string | null = null;
+
   @Output() formClosed = new EventEmitter<void>();
   @Output() goalSaved = new EventEmitter<void>();
-  @Input() hasPartner = false;
 
   title = '';
   description = '';
@@ -24,42 +26,63 @@ export class GoalForm implements OnInit {
   constructor(private goalsService: GoalsService) {}
 
   ngOnInit() {
-    if (this.goal) {
-      this.title = this.goal.title;
-      this.description = this.goal.description || '';
-      this.goalType = this.goal.goalType;
-      this.status = this.goal.status; // 👈
-    }
+    if (!this.goal) return;
+
+    this.title = this.goal.title;
+    this.description = this.goal.description || '';
+    this.goalType = this.goal.goalType;
+    this.status = this.goal.status;
+  }
+
+  get canEditGoalType(): boolean {
+    if (!this.isEditing || !this.goal) return true;
+    return this.goal.createdBy.id === this.currentUserId;
+  }
+
+  private handleSuccess() {
+    this.goalSaved.emit();
+    this.formClosed.emit();
   }
 
   submit() {
     if (this.isEditing && this.goal) {
-      this.goalsService
-        .updateGoal(this.goal.id, {
-          title: this.title,
-          description: this.description,
-          status: this.status, // 👈
-        })
-        .subscribe({
-          next: () => {
-            this.goalSaved.emit();
-            this.formClosed.emit();
-          },
-        });
-    } else {
-      this.goalsService
-        .createGoal({
-          title: this.title,
-          description: this.description,
-          goalType: this.goalType,
-        })
-        .subscribe({
-          next: () => {
-            this.goalSaved.emit();
-            this.formClosed.emit();
-          },
-        });
+      const updateData: {
+        title?: string;
+        description?: string;
+        status?: string;
+        goalType?: string;
+      } = {
+        title: this.title,
+        description: this.description,
+        status: this.status,
+      };
+
+      if (this.canEditGoalType) {
+        updateData.goalType = this.goalType;
+      }
+
+      this.goalsService.updateGoal(this.goal.id, updateData).subscribe({
+        next: () => this.handleSuccess(),
+        error: (err) => {
+          console.error('Error updating goal', err);
+        },
+      });
+
+      return;
     }
+
+    this.goalsService
+      .createGoal({
+        title: this.title,
+        description: this.description,
+        goalType: this.goalType,
+      })
+      .subscribe({
+        next: () => this.handleSuccess(),
+        error: (err) => {
+          console.error('Error creating goal', err);
+        },
+      });
   }
 
   cancel() {

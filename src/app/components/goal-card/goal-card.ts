@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Goal } from '../../models/goal.model';
 import { GoalsService } from '../../services/goals.service';
 
@@ -8,7 +8,7 @@ import { GoalsService } from '../../services/goals.service';
   templateUrl: './goal-card.html',
   styleUrl: './goal-card.css',
 })
-export class GoalCard {
+export class GoalCard implements OnInit {
   @Input() goal!: Goal;
   @Input() currentUserId: string | null = null;
 
@@ -16,6 +16,21 @@ export class GoalCard {
   @Output() goalEdited = new EventEmitter<Goal>();
 
   constructor(private goalsService: GoalsService) {}
+
+  ngOnInit() {
+    console.log('GoalCard debug', {
+      title: this.goal.title,
+      goalType: this.goal.goalType,
+      createdById: this.goal.createdBy?.id,
+      partnerId: this.goal.partner?.id,
+      currentUserId: this.currentUserId,
+      isOwner: this.isOwner,
+      isShared: this.isShared,
+      isPartner: this.isPartner,
+      canEdit: this.canEdit,
+      canDelete: this.canDelete,
+    });
+  }
 
   get isOwner(): boolean {
     return this.goal.createdBy.id === this.currentUserId;

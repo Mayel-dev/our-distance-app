@@ -58,7 +58,13 @@ export class GoalsService {
 
   updateGoal(
     id: string,
-    data: { title?: string; description?: string; status?: string; categoryIcon?: string },
+    data: {
+      title?: string;
+      description?: string;
+      status?: string;
+      goalType?: string;
+      categoryIcon?: string;
+    },
   ) {
     return this.http.patch(`${this.apiUrl}/goals/${id}`, data, {
       headers: this.getHeaders(),

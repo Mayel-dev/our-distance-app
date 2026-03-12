@@ -10,12 +10,16 @@
       [(ngModel)]="description"
     ></textarea>
 
-    <select class="goal-select" [(ngModel)]="goalType">
-      <option value="PRIVATE">Privada</option>
-      <option value="SHARED" [disabled]="!hasPartner">
-        Compartida {{ !hasPartner ? '🔒' : '' }}
-      </option>
-    </select>
+    @if (!canEditGoalType) {
+      <p class="muted">Solo el creador de la meta puede cambiar su tipo 🔒</p>
+    } @else {
+      <select class="goal-select" [(ngModel)]="goalType">
+        <option value="PRIVATE">Privada</option>
+        <option value="SHARED" [disabled]="!hasPartner">
+          Compartida {{ !hasPartner ? '🔒' : '' }}
+        </option>
+      </select>
+    }
 
     @if (isEditing) {
       <select class="goal-select" [(ngModel)]="status">

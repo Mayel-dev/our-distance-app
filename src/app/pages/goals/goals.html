@@ -26,6 +26,7 @@
       [goal]="editingGoal"
       (formClosed)="showForm = false; editingGoal = null"
       (goalSaved)="onGoalSaved()"
+      [currentUserId]="currentUserId"
     ></goal-form>
   }
 
