@@ -30,13 +30,11 @@ export class Goals implements OnInit {
     private authService: AuthService,
   ) {}
 
-  // Helper method to avoid code duplication when fetching goals for different tabs
   private fetchGoals(request: any, tab: 'my' | 'partner' | 'shared') {
     this.loading = true;
 
     request.subscribe({
       next: (response: any) => {
-        console.log('Goals response:', response);
         this.goals = response;
         this.hasPartner = true;
         this.loading = false;
@@ -51,7 +49,6 @@ export class Goals implements OnInit {
     });
   }
 
-  // Method to get the current logged-in user
   private loadCurrentUser() {
     this.authService.getMe().subscribe({
       next: (user: any) => {
@@ -63,41 +60,50 @@ export class Goals implements OnInit {
     });
   }
 
-  // Method to switch between tabs and load corresponding goals
-  setTab(tab: 'my' | 'partner' | 'shared') {
-    this.activeTab = tab;
-    this.showForm = false;
-    this.editingGoal = null;
+  private loadSavedTab() {
+    const savedTab = localStorage.getItem('goalsActiveTab');
 
-    if (tab === 'my') {
+    if (savedTab === 'my' || savedTab === 'partner' || savedTab === 'shared') {
+      this.activeTab = savedTab;
+    } else {
+      this.activeTab = 'my';
+    }
+  }
+
+  private loadGoalsByActiveTab() {
+    if (this.activeTab === 'my') {
       this.loadMyGoals();
     }
 
-    if (tab === 'partner') {
+    if (this.activeTab === 'partner') {
       this.loadPartnerGoals();
     }
 
-    if (tab === 'shared') {
+    if (this.activeTab === 'shared') {
       this.loadSharedGoals();
     }
   }
 
+  setTab(tab: 'my' | 'partner' | 'shared') {
+    this.activeTab = tab;
+    localStorage.setItem('goalsActiveTab', tab);
+
+    this.showForm = false;
+    this.editingGoal = null;
+
+    this.loadGoalsByActiveTab();
+  }
+
   ngOnInit() {
     this.loadCurrentUser();
-    this.loadMyGoals();
+    this.loadSavedTab();
+    this.loadGoalsByActiveTab();
   }
 
   onGoalSaved() {
     this.showForm = false;
     this.editingGoal = null;
-
-    if (this.activeTab === 'my') {
-      this.loadMyGoals();
-    } else if (this.activeTab === 'partner') {
-      this.loadPartnerGoals();
-    } else if (this.activeTab === 'shared') {
-      this.loadSharedGoals();
-    }
+    this.loadGoalsByActiveTab();
   }
 
   onEditGoal(goal: Goal) {
@@ -105,7 +111,11 @@ export class Goals implements OnInit {
     this.showForm = true;
   }
 
-  // Tab loading methods
+  openCreateForm() {
+    this.editingGoal = null;
+    this.showForm = true;
+  }
+
   loadMyGoals() {
     this.fetchGoals(this.goalsService.getMyGoals(), 'my');
   }

@@ -16,7 +16,7 @@
   </div>
 
   @if (activeTab === 'my' || activeTab === 'shared') {
-    <button class="new-goal-btn" (click)="showForm = true">+ Nueva meta</button>
+    <button class="new-goal-btn" (click)="openCreateForm()">+ Nueva meta</button>
   }
 
   @if (showForm) {

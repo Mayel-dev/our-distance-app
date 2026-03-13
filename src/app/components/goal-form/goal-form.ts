@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GoalsService } from '../../services/goals.service';
 import { Goal } from '../../models/goal.model';
@@ -9,7 +17,7 @@ import { Goal } from '../../models/goal.model';
   templateUrl: './goal-form.html',
   styleUrl: './goal-form.css',
 })
-export class GoalForm implements OnInit {
+export class GoalForm implements OnInit, OnChanges {
   @Input() isEditing = false;
   @Input() goal: Goal | null = null;
   @Input() hasPartner = false;
@@ -32,6 +40,24 @@ export class GoalForm implements OnInit {
     this.description = this.goal.description || '';
     this.goalType = this.goal.goalType;
     this.status = this.goal.status;
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['goal']) {
+      if (this.goal) {
+        // modo edición
+        this.title = this.goal.title;
+        this.description = this.goal.description || '';
+        this.goalType = this.goal.goalType;
+        this.status = this.goal.status;
+      } else {
+        // modo nueva meta (reset)
+        this.title = '';
+        this.description = '';
+        this.goalType = 'PRIVATE';
+        this.status = 'PENDING';
+      }
+    }
   }
 
   get canEditGoalType(): boolean {
