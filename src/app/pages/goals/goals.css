@@ -1,20 +1,28 @@
 .goals-container {
-  max-width: 980px;
+  max-width: 95vw;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+  background: #fdf8f3;
+  min-height: 100vh;
 }
 
-/* Tabs (pill style) */
+/* Header row */
+.goals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Tabs */
 .tabs {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.25rem;
-  margin-bottom: 0.6rem;
 }
 
 .tab {
@@ -23,135 +31,201 @@
   justify-content: center;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
-  background: var(--color-gray-100);
+  background: #f0ebe4;
   color: var(--color-text);
   font-weight: 700;
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  transition:
-    background-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.tab:hover,
-.tab:focus {
+.tab:hover {
   transform: translateY(-2px);
 }
 
 .tab.active {
   background: linear-gradient(180deg, var(--color-pink) 0%, var(--color-pink-strong) 100%);
-  color: var(--color-white);
-  box-shadow: 0 8px 22px rgba(255, 143, 177, 0.12);
+  color: white;
+  box-shadow: 0 8px 22px rgba(255, 143, 177, 0.2);
 }
 
-/* Controls row */
-.tabs-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-/* Goals list grid */
-.goals-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-  margin-top: 0.75rem;
-}
-
-/* Goal card base (uses .goal-card from component) */
-.goal-card {
-  background: var(--color-white);
-  border-radius: 12px;
-  padding: 1rem;
-  border: 1px solid var(--color-gray-100);
-  box-shadow: 0 6px 18px rgba(51, 50, 61, 0.04);
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
-}
-
-.goal-card:hover {
-  transform: translateY(-4px);
-}
-
-.goal-card.active {
-  border: 1.5px solid var(--color-pink-strong);
-  box-shadow: 0 10px 30px rgba(255, 143, 177, 0.08);
-}
-
-/* Floating New Goal button (FAB) */
-.new-goal-fab {
-  position: fixed;
-  right: 20px;
-  bottom: 28px;
-  z-index: 1200;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, var(--color-pink) 0%, var(--color-pink-strong) 100%);
-  color: var(--color-white);
-  border: none;
-  box-shadow: 0 12px 30px rgba(255, 143, 177, 0.16);
-  cursor: pointer;
-  font-size: 1.25rem;
-}
-
-.new-goal-fab:hover {
-  transform: translateY(-3px);
-}
-
-/* Alternative highlighted CTA (inline) */
+/* New goal button */
 .new-goal-btn {
   background: linear-gradient(180deg, var(--color-pink) 0%, var(--color-pink-strong) 100%);
-  color: var(--color-white);
-  padding: 0.6rem 1rem;
+  color: white;
+  padding: 0.6rem 1.2rem;
   border-radius: 999px;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  align-self: center; /* avoid stretching full-width in flex column */
-  min-width: 220px;
+  white-space: nowrap;
 }
 
-/* Message when no partner */
-.no-partner {
-  background: var(--color-gray-100);
-  border: 1px dashed rgba(0, 0, 0, 0.06);
-  color: #6b6b73;
+.new-goal-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Kanban board */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* Kanban columns */
+.kanban-column {
+  border-radius: 16px;
   padding: 1rem;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 300px;
+}
+
+/* pending → rosa muy suave/melocotón */
+.kanban-column.pending {
+  background: #fdf2f8;
+}
+
+/* in-progress → lila muy suave */
+.kanban-column.in-progress {
+  background: #faf5ff;
+}
+
+.kanban-column.completed {
+  background: #fffbeb;
+}
+/* Column headers */
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 2px solid rgba(0,0,0,0.06);
+  margin-bottom: 0.25rem;
+}
+
+.column-header.pending {
+  color: #db2777;
+}
+
+.column-header.in-progress {
+  color: #9333ea;
+}
+
+.column-header.completed {
+  color: #b45309;
+}
+
+.column-count {
+  background: rgba(0,0,0,0.07);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.8rem;
+}
+
+/* Empty state */
+.empty-col {
+  color: #aaa;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.loading-text {
+  text-align: center;
+  color: #aaa;
+}
+
+/* No partner */
+.no-partner {
+  background: #f0ebe4;
+  border: 1px dashed rgba(0,0,0,0.08);
+  color: #6b6b73;
+  padding: 1.5rem;
+  border-radius: 12px;
   text-align: center;
   font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 520px) {
-  .goals-container {
-    padding: 0.75rem;
-  }
-  .goals-list {
+/* Mobile */
+@media (max-width: 768px) {
+  .kanban-board {
     grid-template-columns: 1fr;
   }
-  .new-goal-fab {
-    right: 14px;
-    bottom: 18px;
-    width: 50px;
-    height: 50px;
+
+  .goals-header {
+    flex-direction: column;
+    align-items: stretch;
   }
+
   .tabs {
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
   }
+
   .new-goal-btn {
     width: 100%;
-    align-self: stretch;
-    min-width: 0;
+    text-align: center;
+  }
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.fab {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .goals-container {
+    padding-bottom: 140px;  /* espacio para bottom nav + FAB */
+  }
+  .fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--color-pink) 0%, var(--color-pink-strong) 100%);
+    color: white;
+    font-size: 1.75rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(236, 72, 153, 0.3);
+    z-index: 999;
+    transition: transform 160ms ease;
+  }
+
+  .fab:hover {
+    transform: translateY(-3px);
+  }
+
+  /* ocultar el botón Nueva meta en mobile */
+  .new-goal-btn {
+    display: none;
   }
 }
