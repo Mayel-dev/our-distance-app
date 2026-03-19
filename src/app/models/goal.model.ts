@@ -7,7 +7,10 @@ export interface Goal {
   goalType: 'PRIVATE' | 'SHARED';
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   categoryIcon?: string;
+  category?: 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
+  progress?: number;
+  targetDate?: string;
   createdAt: string;
   createdBy: User;
-  partner?: User | null
+  partner?: User | null;
 }

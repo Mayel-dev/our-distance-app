@@ -2,7 +2,17 @@
   <h3 class="form-title">{{ isEditing ? 'Editar meta' : 'Nueva meta' }}</h3>
 
   <div class="gf-row">
-    <input class="goal-input" type="text" placeholder="Título" [(ngModel)]="title" />
+
+    <input
+      class="goal-input"
+      type="text"
+      placeholder="Título"
+      [(ngModel)]="title"
+      (ngModelChange)="titleError = ''"
+    />
+    @if (titleError) {
+      <p class="error-text">{{ titleError }}</p>
+    }
 
     <textarea
       class="goal-textarea"
@@ -13,22 +23,60 @@
     @if (!canEditGoalType) {
       <p class="muted">Solo el creador de la meta puede cambiar su tipo 🔒</p>
     } @else {
-      <select class="goal-select" [(ngModel)]="goalType">
+      <select class="goal-select" [(ngModel)]="goalType" (ngModelChange)="goalTypeError = ''">
         <option value="PRIVATE">Privada</option>
         <option value="SHARED" [disabled]="!hasPartner">
           Compartida {{ !hasPartner ? '🔒' : '' }}
         </option>
       </select>
+
+      @if (!hasPartner) {
+        <p class="muted">Conecta una pareja para crear metas compartidas 💑</p>
+      } @else if (goalTypeError) {
+        <p class="error-text">{{ goalTypeError }}</p>
+      }
     }
 
+    <select class="goal-select" [(ngModel)]="category">
+      <option value="">Sin categoría</option>
+      <option value="HEALTH">🏃 Salud</option>
+      <option value="FINANCE">💰 Finanzas</option>
+      <option value="LEARNING">📚 Aprendizaje</option>
+      <option value="TRAVEL">✈️ Viajes</option>
+      <option value="FITNESS">💪 Fitness</option>
+      <option value="OTHER">⭐ Otro</option>
+    </select>
+
+    <label class="goal-label">Fecha objetivo (opcional)</label>
+    <input
+      class="goal-input"
+      type="date"
+      [(ngModel)]="targetDate"
+    />
+
     @if (isEditing) {
-      <select class="goal-select" [(ngModel)]="status">
+      <select class="goal-select" [(ngModel)]="status" (ngModelChange)="onStatusChange($event)">
         <option value="PENDING">⏳ Pendiente</option>
         <option value="IN_PROGRESS">🔄 En progreso</option>
         <option value="COMPLETED">✅ Completado</option>
       </select>
+
+      <div class="progress-row">
+        <label>Progreso: {{ progress }}%</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          [(ngModel)]="progress"
+        />
+      </div>
     }
+
   </div>
+
+  @if (generalError) {
+    <p class="error-text">{{ generalError }}</p>
+  }
 
   <div class="form-actions">
     <button class="btn btn-primary" (click)="submit()">
@@ -36,4 +84,5 @@
     </button>
     <button class="btn btn-ghost" (click)="cancel()">Cancelar</button>
   </div>
+
 </div>

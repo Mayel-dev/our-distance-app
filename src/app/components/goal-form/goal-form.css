@@ -109,3 +109,9 @@ select.goal-select:focus {
     width: 100%;
   }
 }
+
+.error-text {
+  color: #e05a5a;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}

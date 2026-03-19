@@ -7,8 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class GoalsService {
-  private apiUrl = 'https://our-distance-production-35d4.up.railway.app';
-
+  private apiUrl =  environment.apiUrl;
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -42,8 +41,11 @@ export class GoalsService {
   createGoal(data: {
     title: string;
     description?: string;
-    goalType: string;
+    goalType: 'PRIVATE' | 'SHARED';
     categoryIcon?: string;
+    category?: 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
+    progress?: number;
+    targetDate?: string;
   }) {
     return this.http.post(`${this.apiUrl}/goals`, data, {
       headers: this.getHeaders(),
@@ -64,6 +66,9 @@ export class GoalsService {
       status?: string;
       goalType?: string;
       categoryIcon?: string;
+      category?: 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
+      progress?: number;
+      targetDate?: string;
     },
   ) {
     return this.http.patch(`${this.apiUrl}/goals/${id}`, data, {

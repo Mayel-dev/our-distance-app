@@ -11,6 +11,10 @@ import { FormsModule } from '@angular/forms';
 import { GoalsService } from '../../services/goals.service';
 import { Goal } from '../../models/goal.model';
 
+type GoalType = 'PRIVATE' | 'SHARED';
+type GoalStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+type GoalCategory = 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
+
 @Component({
   selector: 'goal-form',
   imports: [FormsModule],
@@ -26,38 +30,55 @@ export class GoalForm implements OnInit, OnChanges {
   @Output() formClosed = new EventEmitter<void>();
   @Output() goalSaved = new EventEmitter<void>();
 
+  // Propiedades del formulario
   title = '';
   description = '';
-  goalType = 'PRIVATE';
-  status = 'PENDING';
+  goalType: GoalType = 'PRIVATE';
+  status: GoalStatus = 'PENDING';
+  category: GoalCategory | '' = '';
+  progress = 0;
+  targetDate = '';
+  titleError = '';
+  goalTypeError = '';
+  generalError = '';
 
   constructor(private goalsService: GoalsService) {}
 
   ngOnInit() {
     if (!this.goal) return;
-
-    this.title = this.goal.title;
-    this.description = this.goal.description || '';
-    this.goalType = this.goal.goalType;
-    this.status = this.goal.status;
+    this.fillForm(this.goal);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['goal']) {
       if (this.goal) {
-        // modo edición
-        this.title = this.goal.title;
-        this.description = this.goal.description || '';
-        this.goalType = this.goal.goalType;
-        this.status = this.goal.status;
+        this.fillForm(this.goal);
       } else {
-        // modo nueva meta (reset)
-        this.title = '';
-        this.description = '';
-        this.goalType = 'PRIVATE';
-        this.status = 'PENDING';
+        this.resetForm();
       }
     }
+  }
+
+  private fillForm(goal: Goal) {
+    this.title = goal.title;
+    this.description = goal.description || '';
+    this.goalType = goal.goalType;
+    this.status = goal.status;
+    this.category = (goal.category as GoalCategory) || '';
+    this.progress = goal.progress || 0;
+    this.targetDate = goal.targetDate
+      ? new Date(goal.targetDate).toISOString().split('T')[0]
+      : '';
+  }
+
+  private resetForm() {
+    this.title = '';
+    this.description = '';
+    this.goalType = 'PRIVATE';
+    this.status = 'PENDING';
+    this.category = '';
+    this.progress = 0;
+    this.targetDate = '';
   }
 
   get canEditGoalType(): boolean {
@@ -71,16 +92,36 @@ export class GoalForm implements OnInit, OnChanges {
   }
 
   submit() {
+    this.titleError = '';
+    this.goalTypeError = '';
+    this.generalError = '';
+
+    if (!this.title.trim()) {
+      this.titleError = 'El título es obligatorio';
+      return;
+    }
+
+    if (this.goalType === 'SHARED' && !this.hasPartner) {
+      this.goalTypeError = 'Necesitas una pareja para crear metas compartidas';
+      return;
+    }
+
     if (this.isEditing && this.goal) {
       const updateData: {
         title?: string;
         description?: string;
-        status?: string;
-        goalType?: string;
+        status?: GoalStatus;
+        goalType?: GoalType;
+        category?: GoalCategory;
+        progress?: number;
+        targetDate?: string;
       } = {
         title: this.title,
         description: this.description,
         status: this.status,
+        category: this.category || undefined,
+        progress: this.progress,
+        targetDate: this.targetDate || undefined,
       };
 
       if (this.canEditGoalType) {
@@ -90,28 +131,37 @@ export class GoalForm implements OnInit, OnChanges {
       this.goalsService.updateGoal(this.goal.id, updateData).subscribe({
         next: () => this.handleSuccess(),
         error: (err) => {
-          console.error('Error updating goal', err);
+          this.generalError = err.error?.message || 'Error al actualizar la meta';
         },
       });
 
       return;
     }
 
-    this.goalsService
-      .createGoal({
-        title: this.title,
-        description: this.description,
-        goalType: this.goalType,
-      })
-      .subscribe({
-        next: () => this.handleSuccess(),
-        error: (err) => {
-          console.error('Error creating goal', err);
-        },
-      });
+    this.goalsService.createGoal({
+      title: this.title,
+      description: this.description,
+      goalType: this.goalType,
+      category: this.category || undefined,
+      progress: this.progress,
+      targetDate: this.targetDate || undefined,
+    }).subscribe({
+      next: () => this.handleSuccess(),
+      error: (err) => {
+        this.generalError = err.error?.message || 'Error al crear la meta';
+      },
+    });
   }
 
   cancel() {
     this.formClosed.emit();
+  }
+
+  onStatusChange(newStatus: GoalStatus) {
+    if (newStatus === 'COMPLETED') {
+      this.progress = 100;
+    } else if (newStatus === 'PENDING') {
+      this.progress = 0;
+    }
   }
 }

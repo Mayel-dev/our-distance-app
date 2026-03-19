@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://our-distance-production-35d4.up.railway.app';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

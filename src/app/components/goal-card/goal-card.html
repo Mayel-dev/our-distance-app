@@ -8,20 +8,22 @@
     </div>
 
     <div class="goal-meta">
-      <span
-        class="status-badge {{
-          goal.status.toLowerCase() === 'pending'
-            ? 'pending'
-            : goal.status.toLowerCase() === 'in_progress' ||
-                goal.status.toLowerCase() === 'in-progress'
-              ? 'in-progress'
-              : 'completed'
-        }}"
-      >
-        {{ goal.status }}
-      </span>
+      @if (goal.category) {
+        <span class="category-chip">{{ goal.category }}</span>
+      }
     </div>
   </div>
+
+  @if (goal.targetDate) {
+    <div class="goal-target-date">
+      📅 {{ goal.targetDate | date:'mediumDate' }}
+    </div>
+  }
+
+  <div class="progress-bar-container">
+    <div class="progress-bar-fill" [style.width.%]="goal.progress || 0"></div>
+  </div>
+  <div class="progress-label">{{ goal.progress || 0 }}%</div>
 
   <div class="goal-footer">
     <div class="goal-author">{{ goal.createdBy.username }}</div>
@@ -31,7 +33,6 @@
         @if (canEdit) {
           <button class="action-btn edit" (click)="onEdit()">Editar</button>
         }
-
         @if (canDelete) {
           <button class="action-btn delete" (click)="onDelete()">Eliminar</button>
         }
