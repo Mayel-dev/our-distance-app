@@ -1,52 +1,108 @@
 <app-navbar></app-navbar>
 
 <div class="page-content goals-container">
-  <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'my'" (click)="setTab('my')">
-      Mis metas
-    </button>
 
-    <button class="tab" [class.active]="activeTab === 'partner'" (click)="setTab('partner')">
-      Metas de mi pareja
-    </button>
+  <div class="goals-header">
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'my'" (click)="setTab('my')">
+        Mis metas
+      </button>
+      <button class="tab" [class.active]="activeTab === 'partner'" (click)="setTab('partner')">
+        Metas de mi pareja
+      </button>
+      <button class="tab" [class.active]="activeTab === 'shared'" (click)="setTab('shared')">
+        Metas compartidas
+      </button>
+    </div>
 
-    <button class="tab" [class.active]="activeTab === 'shared'" (click)="setTab('shared')">
-      Metas compartidas
-    </button>
+    @if (activeTab === 'my' || activeTab === 'shared') {
+      <button class="new-goal-btn" (click)="openCreateForm()">+ Nueva meta</button>
+    }
   </div>
 
-  @if (activeTab === 'my' || activeTab === 'shared') {
-    <button class="new-goal-btn" (click)="openCreateForm()">+ Nueva meta</button>
-  }
-
   @if (showForm) {
-    <goal-form
-      [hasPartner]="hasPartner"
-      [isEditing]="editingGoal !== null"
-      [goal]="editingGoal"
-      (formClosed)="showForm = false; editingGoal = null"
-      (goalSaved)="onGoalSaved()"
-      [currentUserId]="currentUserId"
-    ></goal-form>
+    <div class="modal-overlay" (click)="showForm = false; editingGoal = null">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <goal-form
+          [hasPartner]="hasPartner"
+          [isEditing]="editingGoal !== null"
+          [goal]="editingGoal"
+          (formClosed)="showForm = false; editingGoal = null"
+          (goalSaved)="onGoalSaved()"
+          [currentUserId]="currentUserId"
+        ></goal-form>
+      </div>
+    </div>
   }
 
   @if (loading) {
-    <p>Cargando metas...</p>
+    <p class="loading-text">Cargando metas...</p>
   } @else if (activeTab !== 'my' && !hasPartner) {
     <div class="no-partner">
       <p>Aún no tienes pareja conectada 💔</p>
       <a routerLink="/pairing">Conectar pareja</a>
     </div>
   } @else {
-    @for (goal of goals; track goal.id) {
-      <app-goal-card
-        [goal]="goal"
-        (goalDeleted)="onGoalSaved()"
-        (goalEdited)="onEditGoal($event)"
-        [currentUserId]="currentUserId"
-      ></app-goal-card>
-    } @empty {
-      <p>Aún no hay metas aquí 🎯</p>
-    }
+    <div class="kanban-board">
+
+      <div class="kanban-column pending">
+        <div class="column-header pending">
+          <span>⏳ Pendiente</span>
+          <span class="column-count">{{ pendingGoals.length }}</span>
+        </div>
+        @for (goal of pendingGoals; track goal.id) {
+          <app-goal-card
+            [goal]="goal"
+            (goalDeleted)="onGoalSaved()"
+            (goalEdited)="onEditGoal($event)"
+            [currentUserId]="currentUserId"
+          ></app-goal-card>
+        } @empty {
+          <p class="empty-col">Sin metas pendientes 🎯</p>
+        }
+      </div>
+
+      <div class="kanban-column in-progress">
+        <div class="column-header in-progress">
+          <span>🔄 En progreso</span>
+          <span class="column-count">{{ inProgressGoals.length }}</span>
+        </div>
+        @for (goal of inProgressGoals; track goal.id) {
+          <app-goal-card
+            [goal]="goal"
+            (goalDeleted)="onGoalSaved()"
+            (goalEdited)="onEditGoal($event)"
+            [currentUserId]="currentUserId"
+          ></app-goal-card>
+        } @empty {
+          <p class="empty-col">Sin metas en progreso 🔄</p>
+        }
+      </div>
+
+      <div class="kanban-column completed">
+        <div class="column-header completed">
+          <span>✅ Completado</span>
+          <span class="column-count">{{ completedGoals.length }}</span>
+        </div>
+        @for (goal of completedGoals; track goal.id) {
+          <app-goal-card
+            [goal]="goal"
+            (goalDeleted)="onGoalSaved()"
+            (goalEdited)="onEditGoal($event)"
+            [currentUserId]="currentUserId"
+          ></app-goal-card>
+        } @empty {
+          <p class="empty-col">Sin metas completadas ✅</p>
+        }
+      </div>
+
+    </div>
   }
+
+  <!-- FAB mobile -->
+  @if (activeTab === 'my' || activeTab === 'shared') {
+    <button class="fab" (click)="openCreateForm()">+</button>
+  }
+
+
 </div>

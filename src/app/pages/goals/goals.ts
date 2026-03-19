@@ -127,4 +127,16 @@ export class Goals implements OnInit {
   loadSharedGoals() {
     this.fetchGoals(this.goalsService.getSharedGoals(), 'shared');
   }
+
+  get pendingGoals(): Goal[] {
+    return this.goals.filter(g => g.status === 'PENDING');
+  }
+
+  get inProgressGoals(): Goal[] {
+    return this.goals.filter(g => g.status === 'IN_PROGRESS');
+  }
+
+  get completedGoals(): Goal[] {
+    return this.goals.filter(g => g.status === 'COMPLETED');
+  }
 }

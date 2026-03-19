@@ -55,12 +55,6 @@
     />
 
     @if (isEditing) {
-      <select class="goal-select" [(ngModel)]="status" (ngModelChange)="onStatusChange($event)">
-        <option value="PENDING">⏳ Pendiente</option>
-        <option value="IN_PROGRESS">🔄 En progreso</option>
-        <option value="COMPLETED">✅ Completado</option>
-      </select>
-
       <div class="progress-row">
         <label>Progreso: {{ progress }}%</label>
         <input

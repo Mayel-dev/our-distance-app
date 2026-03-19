@@ -23,7 +23,7 @@
   <div class="progress-bar-container">
     <div class="progress-bar-fill" [style.width.%]="goal.progress || 0"></div>
   </div>
-  <div class="progress-label">{{ goal.progress || 0 }}%</div>
+  <div class="progress-label">Progreso: {{ goal.progress || 0 }}%</div>
 
   <div class="goal-footer">
     <div class="goal-author">{{ goal.createdBy.username }}</div>
@@ -31,10 +31,10 @@
     @if (canEdit || canDelete) {
       <div class="goal-actions">
         @if (canEdit) {
-          <button class="action-btn edit" (click)="onEdit()">Editar</button>
+          <button class="action-btn edit" (click)="onEdit()">✏️</button>
         }
         @if (canDelete) {
-          <button class="action-btn delete" (click)="onDelete()">Eliminar</button>
+          <button class="action-btn delete" (click)="onDelete()">🗑️</button>
         }
       </div>
     }
