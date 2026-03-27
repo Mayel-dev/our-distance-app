@@ -1,18 +1,43 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from '../../environments/environment';
+import { Goal } from '../models/goal.model';
+
+type GoalType = 'PRIVATE' | 'SHARED';
+type GoalCategory = 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
+
+export interface CreateGoalPayload {
+  title: string;
+  description?: string;
+  goalType: GoalType;
+  categoryIcon?: string;
+  category?: GoalCategory;
+  progress?: number;
+  targetDate?: string;
+}
+
+export interface UpdateGoalPayload {
+  title?: string;
+  description?: string;
+  status?: Goal['status'];
+  goalType?: GoalType;
+  categoryIcon?: string;
+  category?: GoalCategory;
+  progress?: number;
+  targetDate?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class GoalsService {
-  private apiUrl = 'https://our-distance-production-35d4.up.railway.app';
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-  ) {}
+  private readonly apiUrl = 'https://our-distance-production-35d4.up.railway.app';
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
 
+  // TODO: Move this to a separate AuthInterceptor
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
@@ -20,58 +45,38 @@ export class GoalsService {
     });
   }
 
-  getMyGoals() {
-    return this.http.get(`${this.apiUrl}/goals/my-goals`, {
+  getMyGoals(): Observable<Goal[]> {
+    return this.http.get<Goal[]>(`${this.apiUrl}/goals/my-goals`, {
       headers: this.getHeaders(),
     });
   }
 
-  getPartnerGoals() {
-    return this.http.get(`${this.apiUrl}/goals/partner-goals`, {
+  getPartnerGoals(): Observable<Goal[]> {
+    return this.http.get<Goal[]>(`${this.apiUrl}/goals/partner-goals`, {
       headers: this.getHeaders(),
     });
   }
 
-  getSharedGoals() {
-    return this.http.get(`${this.apiUrl}/goals/shared-goals`, {
+  getSharedGoals(): Observable<Goal[]> {
+    return this.http.get<Goal[]>(`${this.apiUrl}/goals/shared-goals`, {
       headers: this.getHeaders(),
     });
   }
 
-  createGoal(data: {
-    title: string;
-    description?: string;
-    goalType: 'PRIVATE' | 'SHARED';
-    categoryIcon?: string;
-    category?: 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
-    progress?: number;
-    targetDate?: string;
-  }) {
-    return this.http.post(`${this.apiUrl}/goals`, data, {
+  createGoal(data: CreateGoalPayload): Observable<Goal> {
+    return this.http.post<Goal>(`${this.apiUrl}/goals`, data, {
       headers: this.getHeaders(),
     });
   }
 
-  deleteGoal(id: string) {
-    return this.http.delete(`${this.apiUrl}/goals/${id}`, {
+  deleteGoal(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/goals/${id}`, {
       headers: this.getHeaders(),
     });
   }
 
-  updateGoal(
-    id: string,
-    data: {
-      title?: string;
-      description?: string;
-      status?: string;
-      goalType?: string;
-      categoryIcon?: string;
-      category?: 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | 'OTHER';
-      progress?: number;
-      targetDate?: string;
-    },
-  ) {
-    return this.http.patch(`${this.apiUrl}/goals/${id}`, data, {
+  updateGoal(id: string, data: UpdateGoalPayload): Observable<Goal> {
+    return this.http.patch<Goal>(`${this.apiUrl}/goals/${id}`, data, {
       headers: this.getHeaders(),
     });
   }

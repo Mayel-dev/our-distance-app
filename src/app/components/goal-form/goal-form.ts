@@ -1,11 +1,12 @@
 import {
   Component,
-  Input,
-  Output,
   EventEmitter,
+  Input,
   OnInit,
   OnChanges,
+  Output,
   SimpleChanges,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GoalsService } from '../../services/goals.service';
@@ -22,6 +23,8 @@ type GoalCategory = 'HEALTH' | 'FINANCE' | 'LEARNING' | 'TRAVEL' | 'FITNESS' | '
   styleUrl: './goal-form.css',
 })
 export class GoalForm implements OnInit, OnChanges {
+  private readonly goalsService = inject(GoalsService);
+
   @Input() isEditing = false;
   @Input() goal: Goal | null = null;
   @Input() hasPartner = false;
@@ -42,14 +45,12 @@ export class GoalForm implements OnInit, OnChanges {
   goalTypeError = '';
   generalError = '';
 
-  constructor(private goalsService: GoalsService) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     if (!this.goal) return;
     this.fillForm(this.goal);
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['goal']) {
       if (this.goal) {
         this.fillForm(this.goal);
@@ -59,19 +60,17 @@ export class GoalForm implements OnInit, OnChanges {
     }
   }
 
-  private fillForm(goal: Goal) {
+  private fillForm(goal: Goal): void {
     this.title = goal.title;
     this.description = goal.description || '';
     this.goalType = goal.goalType;
     this.status = goal.status;
     this.category = (goal.category as GoalCategory) || '';
     this.progress = goal.progress || 0;
-    this.targetDate = goal.targetDate
-      ? new Date(goal.targetDate).toISOString().split('T')[0]
-      : '';
+    this.targetDate = goal.targetDate ? new Date(goal.targetDate).toISOString().split('T')[0] : '';
   }
 
-  private resetForm() {
+  private resetForm(): void {
     this.title = '';
     this.description = '';
     this.goalType = 'PRIVATE';
@@ -86,12 +85,12 @@ export class GoalForm implements OnInit, OnChanges {
     return this.goal.createdBy.id === this.currentUserId;
   }
 
-  private handleSuccess() {
+  private handleSuccess(): void {
     this.goalSaved.emit();
     this.formClosed.emit();
   }
 
-  submit() {
+  submit(): void {
     this.titleError = '';
     this.goalTypeError = '';
     this.generalError = '';
@@ -130,7 +129,7 @@ export class GoalForm implements OnInit, OnChanges {
 
       this.goalsService.updateGoal(this.goal.id, updateData).subscribe({
         next: () => this.handleSuccess(),
-        error: (err) => {
+        error: (err: any) => {
           this.generalError = err.error?.message || 'Error al actualizar la meta';
         },
       });
@@ -138,26 +137,28 @@ export class GoalForm implements OnInit, OnChanges {
       return;
     }
 
-    this.goalsService.createGoal({
-      title: this.title,
-      description: this.description,
-      goalType: this.goalType,
-      category: this.category || undefined,
-      progress: this.progress,
-      targetDate: this.targetDate || undefined,
-    }).subscribe({
-      next: () => this.handleSuccess(),
-      error: (err) => {
-        this.generalError = err.error?.message || 'Error al crear la meta';
-      },
-    });
+    this.goalsService
+      .createGoal({
+        title: this.title,
+        description: this.description,
+        goalType: this.goalType,
+        category: this.category || undefined,
+        progress: this.progress,
+        targetDate: this.targetDate || undefined,
+      })
+      .subscribe({
+        next: () => this.handleSuccess(),
+        error: (err: any) => {
+          this.generalError = err.error?.message || 'Error al crear la meta';
+        },
+      });
   }
 
-  cancel() {
+  cancel(): void {
     this.formClosed.emit();
   }
 
-  onStatusChange(newStatus: GoalStatus) {
+  onStatusChange(newStatus: GoalStatus): void {
     if (newStatus === 'COMPLETED') {
       this.progress = 100;
     } else if (newStatus === 'PENDING') {

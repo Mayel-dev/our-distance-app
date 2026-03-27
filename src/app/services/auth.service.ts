@@ -1,30 +1,44 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
+import { User } from '../models/user.model';
+
+export interface AuthResponse {
+  access_token: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}
+
+export interface UpdateMePayload {
+  username?: string;
+  password?: string;
+  currentPassword?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://our-distance-production-35d4.up.railway.app';
+  private readonly apiUrl = 'https://our-distance-production-35d4.up.railway.app';
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {}
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
-  // Nombres de metodos no importa
-  register(data: { username: string; email: string; password: string }) {
-    return this.http.post(`${this.apiUrl}/auth/register`, data);
+  register(data: { username: string; email: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data);
   }
 
-  login(data: { email: string; password: string }) {
-    return this.http.post(`${this.apiUrl}/auth/login`, data);
+  login(data: { email: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, data);
   }
 
-  getMe() {
-    return this.http.get(`${this.apiUrl}/users/me`, {
+  getMe(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/me`, {
       headers: this.getHeaders(),
     });
   }
@@ -36,35 +50,33 @@ export class AuthService {
     });
   }
 
-  saveToken(token: string) {
+  saveToken(token: string): void {
     localStorage.setItem('token', token);
   }
 
-  getToken() {
+  getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  isLoggedIn() {
+  isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 
-  // Pairing method
-  connectPartner(pairingCode: string) {
-    return this.http.post(
+  connectPartner(pairingCode: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
       `${this.apiUrl}/users/connect-partner`,
       { pairingCode },
       { headers: this.getHeaders() },
     );
   }
 
-  // Unpairing method
-  disconnectPartner() {
-    return this.http.patch(
+  disconnectPartner(): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(
       `${this.apiUrl}/users/disconnect-partner`,
       {},
       {
@@ -73,16 +85,14 @@ export class AuthService {
     );
   }
 
-  // editar perfil
-  updateMe(data: { username?: string; password?: string }) {
-    return this.http.patch(`${this.apiUrl}/users/me`, data, {
+  updateMe(data: UpdateMePayload): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}/users/me`, data, {
       headers: this.getHeaders(),
     });
   }
 
-  // eliminar perfil
-  deleteMe() {
-    return this.http.delete(`${this.apiUrl}/users/me`, {
+  deleteMe(): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/users/me`, {
       headers: this.getHeaders(),
     });
   }

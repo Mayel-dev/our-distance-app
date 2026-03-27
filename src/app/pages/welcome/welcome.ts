@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,13 +8,13 @@ import { Router } from '@angular/router';
   styleUrl: './welcome.css',
 })
 export class Welcome {
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
 
-  goToRegister() {
+  goToRegister(): void {
     this.router.navigate(['/register']);
   }
 
-  goToLogin() {
+  goToLogin(): void {
     this.router.navigate(['/login']);
   }
 }

@@ -1,142 +1,198 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { finalize, Observable } from 'rxjs';
 import { Navbar } from '../../components/navbar/navbar';
 import { GoalsService } from '../../services/goals.service';
 import { AuthService } from '../../services/auth.service';
 import { Goal } from '../../models/goal.model';
-import { CommonModule } from '@angular/common';
+import { User } from '../../models/user.model';
 import { GoalCard } from '../../components/goal-card/goal-card';
 import { GoalForm } from '../../components/goal-form/goal-form';
 
+type GoalTab = 'my' | 'partner' | 'shared';
+type GoalStatus = Goal['status'];
+
+interface GoalColumn {
+  status: GoalStatus;
+  title: string;
+  emptyText: string;
+  cssClass: 'pending' | 'in-progress' | 'completed';
+}
+
+const GOALS_ACTIVE_TAB_KEY = 'goalsActiveTab';
+
 @Component({
   selector: 'app-goals',
-  imports: [Navbar, CommonModule, GoalCard, RouterLink, GoalForm],
+  imports: [Navbar, GoalCard, RouterLink, GoalForm],
   templateUrl: './goals.html',
   styleUrl: './goals.css',
 })
 export class Goals implements OnInit {
-  showForm = false;
-  editingGoal: Goal | null = null;
+  private readonly goalsService = inject(GoalsService);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  activeTab: 'my' | 'partner' | 'shared' = 'my';
-  goals: Goal[] = [];
-  hasPartner = false;
-  loading = false;
+  readonly tabs: ReadonlyArray<{ key: GoalTab; label: string }> = [
+    { key: 'my', label: 'Mis metas' },
+    { key: 'partner', label: 'Metas de mi pareja' },
+    { key: 'shared', label: 'Metas compartidas' },
+  ];
 
-  currentUserId: string | null = null;
+  readonly statusColumns: ReadonlyArray<GoalColumn> = [
+    {
+      status: 'PENDING',
+      title: '⏳ Pendiente',
+      emptyText: 'Sin metas pendientes 🎯',
+      cssClass: 'pending',
+    },
+    {
+      status: 'IN_PROGRESS',
+      title: '🔄 En progreso',
+      emptyText: 'Sin metas en progreso 🔄',
+      cssClass: 'in-progress',
+    },
+    {
+      status: 'COMPLETED',
+      title: '✅ Completado',
+      emptyText: 'Sin metas completadas ✅',
+      cssClass: 'completed',
+    },
+  ];
 
-  constructor(
-    private goalsService: GoalsService,
-    private authService: AuthService,
-  ) {}
+  readonly showForm = signal(false);
+  readonly editingGoal = signal<Goal | null>(null);
+  readonly activeTab = signal<GoalTab>('my');
+  readonly goals = signal<Goal[]>([]);
+  readonly hasPartner = signal(false);
+  readonly loading = signal(false);
+  readonly currentUserId = signal<string | null>(null);
 
-  private fetchGoals(request: any, tab: 'my' | 'partner' | 'shared') {
-    this.loading = true;
+  readonly canCreateGoal = computed(() => {
+    const tab = this.activeTab();
+    return tab === 'my' || tab === 'shared';
+  });
 
-    request.subscribe({
-      next: (response: any) => {
-        this.goals = response;
-        this.hasPartner = true;
-        this.loading = false;
-      },
-      error: () => {
-        if (tab !== 'my') {
-          this.hasPartner = false;
-        }
-        this.goals = [];
-        this.loading = false;
-      },
-    });
-  }
+  readonly goalsByStatus = computed<Record<GoalStatus, Goal[]>>(() => {
+    const goals = this.goals();
 
-  private loadCurrentUser() {
-    this.authService.getMe().subscribe({
-      next: (user: any) => {
-        this.currentUserId = user.id;
-      },
-      error: (err) => {
-        console.error('Error loading current user', err);
-      },
-    });
-  }
+    return {
+      PENDING: goals.filter((goal) => goal.status === 'PENDING'),
+      IN_PROGRESS: goals.filter((goal) => goal.status === 'IN_PROGRESS'),
+      COMPLETED: goals.filter((goal) => goal.status === 'COMPLETED'),
+    };
+  });
 
-  private loadSavedTab() {
-    const savedTab = localStorage.getItem('goalsActiveTab');
-
-    if (savedTab === 'my' || savedTab === 'partner' || savedTab === 'shared') {
-      this.activeTab = savedTab;
-    } else {
-      this.activeTab = 'my';
-    }
-  }
-
-  private loadGoalsByActiveTab() {
-    if (this.activeTab === 'my') {
-      this.loadMyGoals();
-    }
-
-    if (this.activeTab === 'partner') {
-      this.loadPartnerGoals();
-    }
-
-    if (this.activeTab === 'shared') {
-      this.loadSharedGoals();
-    }
-  }
-
-  setTab(tab: 'my' | 'partner' | 'shared') {
-    this.activeTab = tab;
-    localStorage.setItem('goalsActiveTab', tab);
-
-    this.showForm = false;
-    this.editingGoal = null;
-
-    this.loadGoalsByActiveTab();
-  }
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadCurrentUser();
     this.loadSavedTab();
     this.loadGoalsByActiveTab();
   }
 
-  onGoalSaved() {
-    this.showForm = false;
-    this.editingGoal = null;
+  setTab(tab: GoalTab): void {
+    this.activeTab.set(tab);
+    localStorage.setItem(GOALS_ACTIVE_TAB_KEY, tab);
+
+    this.closeForm();
     this.loadGoalsByActiveTab();
   }
 
-  onEditGoal(goal: Goal) {
-    this.editingGoal = goal;
-    this.showForm = true;
+  onGoalSaved(): void {
+    this.closeForm();
+    this.loadGoalsByActiveTab();
   }
 
-  openCreateForm() {
-    this.editingGoal = null;
-    this.showForm = true;
+  onEditGoal(goal: Goal): void {
+    this.editingGoal.set(goal);
+    this.showForm.set(true);
   }
 
-  loadMyGoals() {
-    this.fetchGoals(this.goalsService.getMyGoals(), 'my');
+  openCreateForm(): void {
+    this.editingGoal.set(null);
+    this.showForm.set(true);
   }
 
-  loadPartnerGoals() {
-    this.fetchGoals(this.goalsService.getPartnerGoals(), 'partner');
+  closeForm(): void {
+    this.showForm.set(false);
+    this.editingGoal.set(null);
   }
 
-  loadSharedGoals() {
-    this.fetchGoals(this.goalsService.getSharedGoals(), 'shared');
+  getGoalsForStatus(status: GoalStatus): Goal[] {
+    return this.goalsByStatus()[status];
   }
 
-  get pendingGoals(): Goal[] {
-    return this.goals.filter(g => g.status === 'PENDING');
+  private fetchGoals(request$: Observable<Goal[]>, tab: GoalTab): void {
+    this.loading.set(true);
+
+    request$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loading.set(false)),
+      )
+      .subscribe({
+        next: (response) => {
+          this.goals.set(response);
+
+          if (tab !== 'my') {
+            this.hasPartner.set(true);
+          }
+        },
+        error: (_error: HttpErrorResponse) => {
+          if (tab !== 'my') {
+            this.hasPartner.set(false);
+          }
+
+          this.goals.set([]);
+        },
+      });
   }
 
-  get inProgressGoals(): Goal[] {
-    return this.goals.filter(g => g.status === 'IN_PROGRESS');
+  private getGoalsRequest(tab: GoalTab): Observable<Goal[]> {
+    switch (tab) {
+      case 'my':
+        return this.goalsService.getMyGoals() as Observable<Goal[]>;
+      case 'partner':
+        return this.goalsService.getPartnerGoals() as Observable<Goal[]>;
+      case 'shared':
+        return this.goalsService.getSharedGoals() as Observable<Goal[]>;
+    }
   }
 
-  get completedGoals(): Goal[] {
-    return this.goals.filter(g => g.status === 'COMPLETED');
+  private loadCurrentUser(): void {
+    (this.authService.getMe() as Observable<User>)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.currentUserId.set(user.id);
+          this.hasPartner.set(Boolean(user.partner));
+        },
+        error: (err: unknown) => {
+          console.error('Error loading current user', err);
+        },
+      });
+  }
+
+  private loadSavedTab(): void {
+    const savedTab = localStorage.getItem(GOALS_ACTIVE_TAB_KEY);
+
+    if (savedTab === 'my' || savedTab === 'partner' || savedTab === 'shared') {
+      this.activeTab.set(savedTab);
+      return;
+    }
+
+    this.activeTab.set('my');
+  }
+
+  private loadGoalsByActiveTab(): void {
+    const currentTab = this.activeTab();
+    this.fetchGoals(this.getGoalsRequest(currentTab), currentTab);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Goal } from '../../models/goal.model';
 import { GoalsService } from '../../services/goals.service';
 import { DatePipe } from '@angular/common';
@@ -10,15 +10,13 @@ import { DatePipe } from '@angular/common';
   styleUrl: './goal-card.css',
 })
 export class GoalCard {
+  private readonly goalsService = inject(GoalsService);
+
   @Input() goal!: Goal;
   @Input() currentUserId: string | null = null;
 
   @Output() goalDeleted = new EventEmitter<void>();
   @Output() goalEdited = new EventEmitter<Goal>();
-
-  constructor(private goalsService: GoalsService) {}
-
-
 
   get isOwner(): boolean {
     return this.goal.createdBy.id === this.currentUserId;
@@ -40,18 +38,18 @@ export class GoalCard {
     return this.isOwner;
   }
 
-  onDelete() {
+  onDelete(): void {
     if (!this.canDelete) return;
 
     this.goalsService.deleteGoal(this.goal.id).subscribe({
       next: () => this.goalDeleted.emit(),
-      error: (err) => {
+      error: (err: unknown) => {
         console.error('Error deleting goal', err);
       },
     });
   }
 
-  onEdit() {
+  onEdit(): void {
     if (!this.canEdit) return;
 
     this.goalEdited.emit(this.goal);

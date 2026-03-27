@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../components/navbar/navbar';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, UpdateMePayload } from '../../services/auth.service';
 import { User } from '../../models/user.model';
 
 @Component({
@@ -11,52 +12,65 @@ import { User } from '../../models/user.model';
   styleUrl: './profile.css',
 })
 export class Profile implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+
   user: User | null = null;
   showForm = false;
   newUsername = '';
   newPassword = '';
+  currentPassword = '';
   message = '';
 
-  constructor(private authService: AuthService) {}
-
-  ngOnInit() {
-    this.authService.getMe().subscribe({
-      next: (response: any) => {
-        this.user = response;
-        this.newUsername = response.username;
-      },
-    });
+  ngOnInit(): void {
+    this.reloadUser();
   }
 
-  currentPassword = '';
-
-  update() {
-    const data: any = {};
+  update(): void {
+    const data: UpdateMePayload = {};
     if (this.newUsername) data.username = this.newUsername;
     if (this.newPassword) {
       data.password = this.newPassword;
       data.currentPassword = this.currentPassword;
     }
 
-    this.authService.updateMe(data).subscribe({
-      next: () => {
-        this.message = '¡Perfil actualizado! ✅';
-        this.showForm = false;
-        this.ngOnInit();
-      },
-      error: (err) => {
-        this.message = err.error.message || 'Error al actualizar perfil';
-      },
-    });
-  }
-
-  deleteAccount() {
-    if (confirm('¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
-      this.authService.deleteMe().subscribe({
+    this.authService
+      .updateMe(data)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
         next: () => {
-          this.authService.logout();
+          this.message = '¡Perfil actualizado! ✅';
+          this.showForm = false;
+          this.reloadUser();
+        },
+        error: (err: any) => {
+          this.message = err?.error?.message || 'Error al actualizar perfil';
         },
       });
+  }
+
+  deleteAccount(): void {
+    if (confirm('¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+      this.authService
+        .deleteMe()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.authService.logout();
+          },
+        });
     }
+  }
+
+  private reloadUser(): void {
+    this.authService
+      .getMe()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: User) => {
+          this.user = response;
+          this.newUsername = response.username;
+        },
+      });
   }
 }

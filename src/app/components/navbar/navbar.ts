@@ -1,27 +1,34 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  private readonly authService = inject(AuthService);
+
   isMenuOpen = false;
 
-  constructor(private authService: AuthService) {}
+  readonly navLinks: ReadonlyArray<{ route: string; label: string; icon: string }> = [
+    { route: '/home', label: 'Inicio', icon: '🏠' },
+    { route: '/goals', label: 'Metas', icon: '🎯' },
+    { route: '/pairing', label: 'Conectar', icon: '💑' },
+    { route: '/profile', label: 'Perfil', icon: '👤' },
+  ];
 
-  toggleMenu() {
+  toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  closeMenu() {
+  closeMenu(): void {
     this.isMenuOpen = false;
   }
 
-  logout() {
+  logout(): void {
     this.authService.logout();
   }
 }

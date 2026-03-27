@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { AuthResponse, AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,24 +11,26 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './login.css',
 })
 export class Login {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   email = '';
   password = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
-
-  login() {
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (response: any) => {
-        this.authService.saveToken(response.access_token);
-        this.router.navigate(['/home']);
-      },
-      error: (err) => {
-        console.error('Error al iniciar sesión', err);
-        alert('Credenciales incorrectas');
-      },
-    });
+  login(): void {
+    this.authService
+      .login({ email: this.email, password: this.password })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: AuthResponse) => {
+          this.authService.saveToken(response.access_token);
+          this.router.navigate(['/home']);
+        },
+        error: (err: unknown) => {
+          console.error('Error al iniciar sesión', err);
+          alert('Credenciales incorrectas');
+        },
+      });
   }
 }
