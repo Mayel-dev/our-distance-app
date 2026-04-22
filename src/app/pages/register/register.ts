@@ -29,7 +29,7 @@ export class Register {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: AuthResponse) => {
-          this.authService.saveToken(response.access_token);
+          this.authService.saveSession(response);
           this.router.navigate(['/home']);
         },
         error: (err: unknown) => {

@@ -24,11 +24,11 @@ export class Login {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: AuthResponse) => {
-          this.authService.saveToken(response.access_token);
+          this.authService.saveSession(response);
           this.router.navigate(['/home']);
         },
         error: (err: unknown) => {
-          console.error('Error al iniciar sesión', err);
+          console.error('Error al iniciar sesion', err);
           alert('Credenciales incorrectas');
         },
       });

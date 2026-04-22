@@ -1,6 +1,8 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 import { Navbar } from '../../components/navbar/navbar';
 import { AuthService, UpdateMePayload } from '../../services/auth.service';
 import { User } from '../../models/user.model';
@@ -27,20 +29,56 @@ export class Profile implements OnInit {
   }
 
   update(): void {
-    const data: UpdateMePayload = {};
-    if (this.newUsername) data.username = this.newUsername;
-    if (this.newPassword) {
-      data.password = this.newPassword;
-      data.currentPassword = this.currentPassword;
+    const updatePayload: UpdateMePayload = {};
+    const trimmedUsername = this.newUsername.trim();
+    const usernameChanged = !!this.user && trimmedUsername !== this.user.username;
+    const wantsPasswordChange = !!this.currentPassword || !!this.newPassword;
+
+    if (!usernameChanged && !wantsPasswordChange) {
+      this.message = 'No hay cambios para guardar';
+      return;
     }
 
-    this.authService
-      .updateMe(data)
+    if (usernameChanged) {
+      updatePayload.username = trimmedUsername;
+    }
+
+    if (wantsPasswordChange && (!this.currentPassword || !this.newPassword)) {
+      this.message = 'Completa la contrasena actual y la nueva contrasena';
+      return;
+    }
+
+    let request$: Observable<unknown> = of(null);
+
+    if (updatePayload.username) {
+      request$ = this.authService.updateMe(updatePayload);
+    }
+
+    if (wantsPasswordChange) {
+      request$ = request$.pipe(
+        concatMap(() =>
+          this.authService.changePassword({
+            currentPassword: this.currentPassword,
+            newPassword: this.newPassword,
+          }),
+        ),
+      );
+    }
+
+    request$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.message = '¡Perfil actualizado! ✅';
+          if (wantsPasswordChange) {
+            alert('Contrasena actualizada. Inicia sesion nuevamente.');
+            this.authService.clearSession();
+            return;
+          }
+
+          this.message = 'Perfil actualizado';
           this.showForm = false;
+          this.currentPassword = '';
+          this.newPassword = '';
           this.reloadUser();
         },
         error: (err: any) => {
@@ -50,13 +88,13 @@ export class Profile implements OnInit {
   }
 
   deleteAccount(): void {
-    if (confirm('¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+    if (confirm('Seguro que quieres eliminar tu cuenta? Esta accion no se puede deshacer.')) {
       this.authService
         .deleteMe()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
-            this.authService.logout();
+            this.authService.clearSession();
           },
         });
     }
